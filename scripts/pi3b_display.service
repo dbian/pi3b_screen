@@ -1,0 +1,34 @@
+[Unit]
+Description=Pi3B OLED Display Service
+Documentation=https://github.com/yourusername/pi3b_screen
+After=network.target
+Wants=network.target
+
+[Service]
+Type=simple
+User=root
+Group=root
+WorkingDirectory=/opt/pi3b_display/src
+ExecStart=/usr/bin/python3 /opt/pi3b_display/src/main.py
+ExecReload=/bin/kill -HUP $MAINPID
+KillMode=process
+Restart=always
+RestartSec=10
+TimeoutStartSec=30
+TimeoutStopSec=10
+
+# 日志配置
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=pi3b_display
+
+# 安全配置
+NoNewPrivileges=true
+PrivateTmp=true
+
+# 环境变量
+Environment=PYTHONPATH=/opt/pi3b_display/src
+Environment=PYTHONUNBUFFERED=1
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,3 @@
+# Python依赖包
+luma.oled==3.12.0
+requests==2.31.0
