@@ -22,7 +22,15 @@
 
 ## 快速部署
 
+### 系统要求
+
+- 树莓派3B (运行OpenWrt系统或标准Linux发行版)
+- Python 3.6+ 环境
+- i2c接口支持
+
 ### 方法1: 远程部署（推荐）
+
+#### 标准Linux系统 (systemd)
 ```bash
 # 在本地运行，自动部署到树莓派
 chmod +x deploy.sh
@@ -32,7 +40,17 @@ chmod +x deploy.sh
 ./deploy.sh 192.168.1.1 root
 ```
 
+#### OpenWrt系统 (虚拟环境部署)
+```bash
+# OpenWrt系统推荐使用虚拟环境部署
+./deploy.sh 192.168.1.1 root openwrt
+```
+
+> **OpenWrt用户**: 由于OpenWrt系统没有systemd，请参考 [OPENWRT_DEPLOY.md](OPENWRT_DEPLOY.md) 获取详细的部署指南，包括LuCI界面配置和虚拟环境设置。
+
 ### 方法2: 手动部署
+
+#### 标准Linux系统
 ```bash
 # 1. 传输文件到树莓派
 scp -r pi3b_screen/ root@192.168.1.1:/tmp/
@@ -44,6 +62,20 @@ ssh root@192.168.1.1
 cd /tmp/pi3b_screen
 chmod +x scripts/install.sh
 ./scripts/install.sh
+```
+
+#### OpenWrt系统
+```bash
+# 1. 传输文件到树莓派
+scp -r pi3b_screen/ root@192.168.1.1:/tmp/
+
+# 2. SSH登录树莓派
+ssh root@192.168.1.1
+
+# 3. 使用OpenWrt安装脚本
+cd /tmp/pi3b_screen
+chmod +x scripts/install_openwrt.sh
+./scripts/install_openwrt.sh
 ```
 
 ## 显示内容
@@ -100,7 +132,8 @@ pi3b_screen/
 │   ├── system_monitor.py     # 系统信息监控
 │   └── config.py            # 配置文件
 ├── scripts/                  # 脚本目录
-│   ├── install.sh           # 安装脚本
+│   ├── install.sh           # 标准Linux安装脚本
+│   ├── install_openwrt.sh   # OpenWrt专用安装脚本
 │   ├── uninstall.sh         # 卸载脚本
 │   ├── start.sh             # 手动启动脚本
 │   ├── test.sh              # 功能测试脚本
@@ -108,12 +141,14 @@ pi3b_screen/
 ├── deploy.sh                # 远程部署脚本
 ├── requirements.txt         # Python依赖包
 ├── README.md               # 项目说明
-└── DEPLOY.md               # 详细部署文档
+├── DEPLOY.md               # 详细部署文档 (标准Linux)
+└── OPENWRT_DEPLOY.md       # OpenWrt专用部署文档
 ```
 
 ## 常用命令
 
 ```bash
+# 标准Linux系统 (systemd)
 # 查看服务状态
 systemctl status pi3b_display
 
@@ -134,6 +169,33 @@ tail -f /var/log/pi3b_display.log
 # 手动启动程序（调试用）
 cd /opt/pi3b_display/src
 python3 main.py
+```
+
+### OpenWrt系统命令
+
+```bash
+# 查看服务状态
+/etc/init.d/pi3b_display status
+
+# 启动/停止/重启服务
+/etc/init.d/pi3b_display start
+/etc/init.d/pi3b_display stop
+/etc/init.d/pi3b_display restart
+
+# 启用/禁用自启动
+/etc/init.d/pi3b_display enable
+/etc/init.d/pi3b_display disable
+
+# 查看日志
+tail -f /var/log/pi3b_display.log
+logread | grep pi3b_display
+
+# 手动启动程序（调试用）
+cd /opt/src
+/opt/pi3b_venv/bin/python3 main.py
+```
+
+> **LuCI管理**: OpenWrt用户可以通过LuCI界面 (系统 -> 启动项) 管理服务的启用/禁用状态
 ```
 
 ## 配置自定义

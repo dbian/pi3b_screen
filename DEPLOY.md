@@ -25,7 +25,15 @@ i2cdetect -y 1
 
 ## 部署步骤
 
-### 方法1: 直接在树莓派上部署
+### 支持的系统
+
+本项目支持以下系统：
+- **标准Linux发行版** (使用systemd): Ubuntu, Debian, CentOS等
+- **OpenWrt系统** (无systemd): 专门的部署方式
+
+> **OpenWrt用户注意**: 如果您使用的是OpenWrt系统，请参考 [OPENWRT_DEPLOY.md](OPENWRT_DEPLOY.md) 获取专门的部署指南，包括虚拟环境部署和LuCI界面配置。
+
+### 方法1: 直接在树莓派上部署 (标准Linux)
 
 1. **传输项目文件**
 ```bash
@@ -49,39 +57,18 @@ chmod +x scripts/install.sh
 ./scripts/install.sh
 ```
 
-### 方法2: 使用SSH远程部署脚本
+### 方法2: 使用SSH远程部署脚本 (标准Linux)
 
 1. **创建远程部署脚本** (在本地运行)
 ```bash
-#!/bin/bash
-# deploy.sh - 远程部署脚本
+# 标准Linux系统 (systemd)
+./deploy.sh 192.168.1.1 root
 
-PI_HOST="192.168.1.1"
-PI_USER="root"
-PROJECT_DIR="/tmp/pi3b_screen"
-
-echo "正在部署到 $PI_USER@$PI_HOST..."
-
-# 传输项目文件
-echo "传输项目文件..."
-scp -r ./ $PI_USER@$PI_HOST:$PROJECT_DIR
-
-# 远程执行安装
-echo "远程执行安装..."
-ssh $PI_USER@$PI_HOST << 'EOF'
-cd /tmp/pi3b_screen
-chmod +x scripts/install.sh
-./scripts/install.sh
-EOF
-
-echo "部署完成!"
+# OpenWrt系统 (推荐使用专门的部署方式)
+./deploy.sh 192.168.1.1 root openwrt
 ```
 
-2. **运行部署脚本**
-```bash
-chmod +x deploy.sh
-./deploy.sh
-```
+> **提示**: 对于OpenWrt系统，建议使用虚拟环境部署方式，详见 [OPENWRT_DEPLOY.md](OPENWRT_DEPLOY.md)
 
 ## 验证安装
 
