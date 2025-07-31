@@ -6,6 +6,34 @@
 
 set -e
 
+# 显示帮助信息
+show_help() {
+    echo "Pi3B Display 远程部署脚本"
+    echo ""
+    echo "使用方法:"
+    echo "  $0 [IP地址] [用户名] [部署模式]"
+    echo ""
+    echo "参数:"
+    echo "  IP地址      目标设备IP地址 (默认: 192.168.1.1)"
+    echo "  用户名      SSH用户名 (默认: root)"
+    echo "  部署模式    systemd|openwrt (默认: systemd)"
+    echo ""
+    echo "示例:"
+    echo "  $0 192.168.1.100 root systemd    # 标准Linux系统"
+    echo "  $0 192.168.1.100 root openwrt    # OpenWrt系统"
+    echo "  $0 192.168.1.100                 # 使用默认用户名和部署模式"
+    echo ""
+    echo "说明:"
+    echo "  systemd模式: 适用于Ubuntu/Debian等标准Linux发行版"
+    echo "  openwrt模式: 适用于OpenWrt系统，使用虚拟环境和init.d服务"
+}
+
+# 检查帮助参数
+if [[ "$1" == "--help" || "$1" == "-h" ]]; then
+    show_help
+    exit 0
+fi
+
 # 默认配置
 DEFAULT_PI_HOST="192.168.1.1"
 DEFAULT_PI_USER="root"
@@ -16,6 +44,15 @@ REMOTE_DIR="/tmp/$PROJECT_NAME"
 PI_HOST="${1:-$DEFAULT_PI_HOST}"
 PI_USER="${2:-$DEFAULT_PI_USER}"
 DEPLOY_MODE="${3:-systemd}"
+
+# 验证部署模式
+if [[ "$DEPLOY_MODE" != "systemd" && "$DEPLOY_MODE" != "openwrt" ]]; then
+    echo "错误: 无效的部署模式 '$DEPLOY_MODE'"
+    echo "支持的模式: systemd, openwrt"
+    echo ""
+    show_help
+    exit 1
+fi
 
 echo "========================================="
 echo "Pi3B Display 远程部署脚本"
